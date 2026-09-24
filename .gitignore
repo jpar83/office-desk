@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-portable/
+coverage/
+playwright-report/
+test-results/
+work/
+outputs/
+.DS_Store
+*.tsbuildinfo
