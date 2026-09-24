@@ -2,6 +2,8 @@
 
 A small place for the time and office tools you use every day. Office Desk is a private, zero-install browser utility: countdowns, timers, meeting pacing, focus sessions, notes, text cleanup, date math, business percentages, and local QR generation.
 
+Personalize the interface in Settings with six built-in palettes or customize 14 colors separately for light and dark appearance. Color changes stay in local browser storage, and built-in palettes are checked for readable contrast.
+
 ## Privacy
 
 Saved countdowns, notes, checklist items, and preferences stay in browser storage on this device. No account, backend, analytics, ads, or third-party runtime requests are used. Countdown sharing creates a URL containing only the configuration you choose to share; custom images and unrelated saved data are excluded. See [Privacy](docs/privacy.md).
@@ -15,6 +17,8 @@ Saved countdowns, notes, checklist items, and preferences stay in browser storag
 ## Screenshots
 
 ![Office Desk home screen](docs/screenshots/home-desktop.png)
+
+![Color Studio with custom palette controls](docs/screenshots/color-studio-desktop.png)
 
 ![Vacation countdown](docs/screenshots/countdown-vacation-desktop.png)
 

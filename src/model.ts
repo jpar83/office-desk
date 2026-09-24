@@ -1,11 +1,33 @@
 export type Theme = 'Minimal' | 'Vacation' | 'Birthday' | 'Goal' | 'Project Launch' | 'Celebration'
 export type EventType = 'Vacation' | 'Birthday' | 'Goal Start' | 'Goal Finish' | 'Project Launch' | 'Custom'
+export type PaletteName = 'sage' | 'ocean' | 'plum' | 'sunset' | 'rose' | 'graphite' | 'custom'
+export type PaletteMode = 'light' | 'dark'
+export type ColorTokens = { page: string; card: string; raised: string; text: string; muted: string; border: string; accent: string; onAccent: string; accentText: string; accentSoft: string; positive: string; warning: string; danger: string; warm: string }
+export type CustomPalettes = Record<PaletteMode, ColorTokens>
+export const DEFAULT_CUSTOM_PALETTES: CustomPalettes = {
+  light: { page:'#f5f5f3',card:'#ffffff',raised:'#f0f0ed',text:'#282923',muted:'#696b63',border:'#e3e4de',accent:'#667153',onAccent:'#ffffff',accentText:'#58634c',accentSoft:'#edf0e9',positive:'#377b58',warning:'#9a6514',danger:'#bb514c',warm:'#f1e8dc' },
+  dark: { page:'#171916',card:'#20231f',raised:'#2a2d28',text:'#f0f0e9',muted:'#a8aba0',border:'#383d35',accent:'#a7b19a',onAccent:'#171916',accentText:'#d5ddcb',accentSoft:'#30382d',positive:'#85c59b',warning:'#f0c274',danger:'#ff8e84',warm:'#403528' },
+}
+export const COLOR_PRESETS: Record<Exclude<PaletteName, 'custom'>, CustomPalettes> = {
+  sage: DEFAULT_CUSTOM_PALETTES,
+  ocean: { light:{page:'#f1f7fa',card:'#ffffff',raised:'#e5f0f5',text:'#173244',muted:'#567080',border:'#d1e1e9',accent:'#167e9c',onAccent:'#ffffff',accentText:'#11647c',accentSoft:'#dceff4',positive:'#287552',warning:'#95620f',danger:'#b44750',warm:'#f6e8d8'}, dark:{page:'#101b22',card:'#182832',raised:'#223743',text:'#edf6f8',muted:'#a4bac4',border:'#304753',accent:'#66c1d6',onAccent:'#10232b',accentText:'#8bd9e8',accentSoft:'#213f49',positive:'#8bd1a7',warning:'#f0c274',danger:'#ff9294',warm:'#3d3028'} },
+  plum: { light:{page:'#f7f3fa',card:'#ffffff',raised:'#eee7f4',text:'#30223d',muted:'#766780',border:'#e1d6e9',accent:'#8051a1',onAccent:'#ffffff',accentText:'#693c87',accentSoft:'#efe4f6',positive:'#397454',warning:'#986214',danger:'#b64e66',warm:'#f6e7ed'}, dark:{page:'#1c1721',card:'#28212f',raised:'#352b3e',text:'#f7effb',muted:'#c0b1c9',border:'#44384e',accent:'#c19bdd',onAccent:'#24182d',accentText:'#dfc4f2',accentSoft:'#3a2c45',positive:'#91cba5',warning:'#f1c47a',danger:'#ff9eae',warm:'#44303e'} },
+  sunset: { light:{page:'#fbf4ef',card:'#ffffff',raised:'#f5e9df',text:'#3c2b25',muted:'#80685d',border:'#ead8ca',accent:'#aa4c30',onAccent:'#ffffff',accentText:'#923e28',accentSoft:'#fbe6da',positive:'#42774f',warning:'#99600f',danger:'#ad3f49',warm:'#f6dfc9'}, dark:{page:'#211916',card:'#30231e',raised:'#40302a',text:'#fff2e8',muted:'#c9aa99',border:'#513d34',accent:'#f08c62',onAccent:'#32190e',accentText:'#ffb595',accentSoft:'#4a2f25',positive:'#9acb91',warning:'#f4c16c',danger:'#ff9288',warm:'#543a2c'} },
+  rose: { light:{page:'#fbf3f5',card:'#ffffff',raised:'#f4e7eb',text:'#39252c',muted:'#806a71',border:'#ead8df',accent:'#b34f72',onAccent:'#ffffff',accentText:'#943b5d',accentSoft:'#f8e3eb',positive:'#34724f',warning:'#95600f',danger:'#b43f50',warm:'#f6e5d8'}, dark:{page:'#21181c',card:'#302329',raised:'#403038',text:'#fff1f4',muted:'#c9abb5',border:'#523943',accent:'#e08bab',onAccent:'#321925',accentText:'#f2abc2',accentSoft:'#482b38',positive:'#91cba0',warning:'#f0c477',danger:'#ff9aa6',warm:'#4b302c'} },
+  graphite: { light:{page:'#f2f3f4',card:'#ffffff',raised:'#e8eaec',text:'#22262b',muted:'#656d75',border:'#d9dde1',accent:'#495766',onAccent:'#ffffff',accentText:'#37434f',accentSoft:'#e2e8ed',positive:'#347653',warning:'#8d6119',danger:'#b44747',warm:'#eee7dc'}, dark:{page:'#15181b',card:'#202428',raised:'#2a3035',text:'#f1f3f4',muted:'#aab1b6',border:'#3b4349',accent:'#a7bac8',onAccent:'#1a242b',accentText:'#c7d6df',accentSoft:'#303b43',positive:'#8ac49e',warning:'#e7bf75',danger:'#f08b86',warm:'#3b342a'} },
+}
+export const COLOR_TOKEN_LABELS: Record<keyof ColorTokens,string> = { page:'Page background',card:'Cards',raised:'Raised cards and input fields',text:'Main text',muted:'Secondary text',border:'Borders and dividers',accent:'Primary buttons and highlights',onAccent:'Text on primary buttons',accentText:'Links and accent text',accentSoft:'Soft accent backgrounds',positive:'Success states',warning:'Warnings',danger:'Errors and delete actions',warm:'Warm highlights' }
+export function contrastRatio(foreground: string, background: string) {
+  const luminance = (hex:string) => { const rgb=hex.slice(1).match(/.{2}/g)!.map(v=>parseInt(v,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4); return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2] }
+  const values=[luminance(foreground),luminance(background)].sort((a,b)=>b-a)
+  return (values[0]+.05)/(values[1]+.05)
+}
 export type Countdown = {
   id: string; title: string; subtitle: string; eventType: EventType; target: string; timezone: string; theme: Theme
   reference: string; completion: 'complete' | 'since'; celebration: 'none' | 'subtle' | 'celebrate' | 'party'; sound: boolean; image?: string
 }
-export type DeskData = { version: 1; events: Countdown[]; primaryId: string | null; note: string; checklist: { id: string; text: string; done: boolean }[]; appearance: 'light' | 'dark' | 'system'; sound: boolean }
-export const freshData = (): DeskData => ({ version: 1, events: [], primaryId: null, note: '', checklist: [], appearance: 'system', sound: false })
+export type DeskData = { version: 1; events: Countdown[]; primaryId: string | null; note: string; checklist: { id: string; text: string; done: boolean }[]; appearance: 'light' | 'dark' | 'system'; sound: boolean; palette: PaletteName; customPalettes: CustomPalettes }
+export const freshData = (): DeskData => ({ version: 1, events: [], primaryId: null, note: '', checklist: [], appearance: 'system', sound: false, palette: 'sage', customPalettes: structuredClone(DEFAULT_CUSTOM_PALETTES) })
 export const STORAGE_KEY = 'officeDesk.v1'
 export function readData(): DeskData {
   try {
@@ -30,7 +52,15 @@ export function readData(): DeskData {
     })
     const checklist = Array.isArray(parsed.checklist) ? parsed.checklist.flatMap(item => item && typeof item.id === 'string' && typeof item.text === 'string' ? [{ id: item.id.slice(0,80), text: item.text.slice(0,500), done: Boolean(item.done) }] : []) : []
     const appearance = ['light','dark','system'].includes(parsed.appearance as string) ? parsed.appearance as DeskData['appearance'] : 'system'
-    return { version: 1, events, primaryId: typeof parsed.primaryId === 'string' && events.some(event => event.id === parsed.primaryId) ? parsed.primaryId : events[0]?.id ?? null, note: typeof parsed.note === 'string' ? parsed.note.slice(0,100_000) : '', checklist, appearance, sound: Boolean(parsed.sound) }
+    const paletteNames = ['sage','ocean','plum','sunset','rose','graphite','custom']
+    const palette = paletteNames.includes(parsed.palette as string) ? parsed.palette as PaletteName : 'sage'
+    const readTokens = (rawTokens: unknown, fallback: ColorTokens): ColorTokens => {
+      const value = rawTokens && typeof rawTokens === 'object' ? rawTokens as Record<string, unknown> : {}
+      return Object.fromEntries(Object.keys(fallback).map(key => [key, typeof value[key] === 'string' && /^#[\da-f]{6}$/i.test(value[key] as string) ? value[key] : fallback[key as keyof ColorTokens]])) as ColorTokens
+    }
+    const rawPalettes = parsed.customPalettes && typeof parsed.customPalettes === 'object' ? parsed.customPalettes as Partial<CustomPalettes> : {}
+    const customPalettes: CustomPalettes = { light: readTokens(rawPalettes.light, DEFAULT_CUSTOM_PALETTES.light), dark: readTokens(rawPalettes.dark, DEFAULT_CUSTOM_PALETTES.dark) }
+    return { version: 1, events, primaryId: typeof parsed.primaryId === 'string' && events.some(event => event.id === parsed.primaryId) ? parsed.primaryId : events[0]?.id ?? null, note: typeof parsed.note === 'string' ? parsed.note.slice(0,100_000) : '', checklist, appearance, sound: Boolean(parsed.sound), palette, customPalettes }
   } catch { return freshData() }
 }
 export const saveData = (data: DeskData) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); return true } catch { return false } }

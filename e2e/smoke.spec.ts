@@ -22,7 +22,7 @@ test('home opens and core features are navigable', async ({ page }) => {
 test('first-run home has no serious axe violations', async ({ page }) => {
   await page.goto('/')
   const results = await new AxeBuilder({ page }).analyze()
-  expect(results.violations.filter(v => v.impact === 'critical' || v.impact === 'serious').map(v => ({ id: v.id, nodes: v.nodes.length }))).toEqual([])
+  expect(results.violations.filter(v => v.impact === 'critical' || v.impact === 'serious').map(v => ({ id: v.id, nodes: v.nodes.map(n=>({target:n.target,summary:n.failureSummary})) }))).toEqual([])
 })
 
 test('mobile navigation exposes every supporting tool', async ({ page }) => {
@@ -223,6 +223,26 @@ test('checklist, business calculations, and QR generation work end to end', asyn
   await expect(page.getByRole('img', { name: 'Generated QR code' })).toHaveAttribute('src', /^data:image\/png/)
 })
 
+test('color studio previews and persists separate light and dark custom palettes', async ({ page }) => {
+  await page.goto('/#/settings')
+  await page.getByRole('button', { name: /Coastal Blue/ }).click()
+  await expect.poll(() => page.locator('html').evaluate(node => getComputedStyle(node).getPropertyValue('--accent').trim())).toBe('#167e9c')
+  await page.getByRole('button', { name: 'Dark colors' }).click()
+  await page.getByLabel('Primary buttons and highlights color').fill('#8f29bf')
+  await page.getByLabel('Text on primary buttons color').fill('#ffffff')
+  await page.getByLabel('Appearance', { exact: true }).selectOption('dark')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  await expect.poll(() => page.locator('html').evaluate(node => getComputedStyle(node).getPropertyValue('--accent').trim())).toBe('#8f29bf')
+  await page.reload()
+  await expect.poll(() => page.locator('html').evaluate(node => getComputedStyle(node).getPropertyValue('--accent').trim())).toBe('#8f29bf')
+  await expect(page.getByRole('button', { name: /My custom colors/ })).toHaveAttribute('aria-pressed', 'true')
+  await page.getByLabel('Appearance', { exact: true }).selectOption('light')
+  await page.getByRole('button', { name: 'Light colors' }).click()
+  await expect.poll(() => page.locator('html').evaluate(node => getComputedStyle(node).getPropertyValue('--accent').trim())).toBe('#167e9c')
+  const results = await new AxeBuilder({ page }).analyze()
+  expect(results.violations.filter(v => v.impact === 'critical' || v.impact === 'serious').map(v => v.id)).toEqual([])
+})
+
 test('timer completion and focus-to-break transition use the selected durations', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-09-24T12:00:00') })
   await page.goto('/#/timer')
@@ -273,6 +293,9 @@ test('captures representative desktop, mobile, theme, and tool screens', async (
   await page.setViewportSize({ width: 1440, height: 1050 })
   await page.goto('/')
   await page.screenshot({ path: 'docs/screenshots/home-desktop.png', fullPage: true })
+  await page.goto('/#/settings')
+  await page.screenshot({ path: 'docs/screenshots/color-studio-desktop.png', fullPage: true })
+  await page.goto('/')
   await page.getByRole('button', { name: /Add your first countdown/ }).click()
   await page.getByLabel('Event title').fill('Mountain weekend')
   const futureLocalMinute = await page.evaluate(() => { const d=new Date(Date.now()+120_000);d.setSeconds(0,0);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}` })
